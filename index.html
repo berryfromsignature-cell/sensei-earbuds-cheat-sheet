@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sensei · kosuke.ai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      background: #000;
+      color: #fff;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      font-size: 18px;
+      line-height: 1.48;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 40px 36px 56px;
+      background: #000;
+    }
+
+    html.export-mode,
+    html.export-mode body {
+      width: 940px;
+      margin: 0;
+      overflow: visible;
+    }
+
+    html.export-mode .page {
+      margin: 0;
+      padding: 40px 36px 56px;
+    }
+
+    h2.section-title {
+      display: block;
+      width: fit-content;
+      font-family: "Roboto Mono", ui-monospace, monospace;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0;
+      margin-bottom: 14px;
+      color: #1a1a1a;
+      padding: 4px 10px;
+      border-radius: 3px;
+      line-height: 1.65;
+    }
+
+    .section > * + * {
+      margin-top: 0;
+    }
+
+    .section > ul.bullets + p.code-intro,
+    .section > pre.code + ul.bullets,
+    .section > pre.code + p.code-intro {
+      margin-top: 14px;
+    }
+
+    .section:nth-of-type(4n + 1) .section-title { background: #ffd966; }
+    .section:nth-of-type(4n + 2) .section-title { background: #7ec8ff; }
+    .section:nth-of-type(4n + 3) .section-title { background: #72e8a8; }
+    .section:nth-of-type(4n) .section-title { background: #ff8f8f; }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+    }
+
+    ul.bullets {
+      list-style: disc;
+      padding-left: 24px;
+      color: #f0f0f0;
+      font-size: 18px;
+      line-height: 1.48;
+    }
+
+    ul.bullets li {
+      margin-bottom: 11px;
+    }
+
+    ul.bullets li:last-child {
+      margin-bottom: 0;
+    }
+
+    ul.bullets strong {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .sub {
+      font-size: 17px;
+      color: #c0c0c0;
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+
+    p.code-intro {
+      margin: 14px 0 8px;
+      color: #f0f0f0;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    pre.code {
+      font-family: "Roboto Mono", ui-monospace, monospace;
+      font-size: 14px;
+      line-height: 1.48;
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 16px 18px;
+      color: #f5f5f5;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0 0 12px;
+    }
+
+    pre.code:last-child {
+      margin-bottom: 0;
+    }
+
+    .dense-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 18px;
+      line-height: 1.52;
+      color: #f0f0f0;
+    }
+
+    .dense-lines p {
+      max-width: 100%;
+    }
+
+    .dense-lines .kw {
+      font-family: "Roboto Mono", ui-monospace, monospace;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      color: #fff;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: "Roboto Mono", monospace;
+      font-size: 11px;
+      color: #555;
+    }
+
+    html.export-mode .hint {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <article class="page">
+
+    <section class="section">
+      <h2 class="section-title">&lt;Requirements&gt;</h2>
+      <ul class="bullets">
+        <li><strong>Hardware:</strong> Mac (Apple Silicon) + iPhone or Android + earbuds (mic + media).</li>
+        <li><strong>AI stack:</strong> Claude Pro (with Claude Code) + ChatGPT Plus or Team.</li>
+        <li><strong>Orchestration:</strong> <a href="https://kosuke.ai/" style="color:#f0f0f0">Sensei</a> (kosuke.ai) via MCP. Agents on Mac. Audio on phone.</li>
+        <li><strong>Network:</strong> Tailscale (private tailnet between Mac and phone).</li>
+        <li><strong>Optional:</strong> GitHub and Linear and Notion and Telegram for artifacts and alerts.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">&lt;Setup&gt;</h2>
+      <ul class="bullets">
+        <li>Join Mac and phone to the same Tailscale tailnet. Confirm both devices are online.</li>
+        <li>Connect Sensei as an MCP server in Claude Code and ChatGPT.</li>
+      </ul>
+      <pre class="code">claude mcp add --transport http kosuke https://app.kosuke.ai/api/mcp</pre>
+      <pre class="code"># ChatGPT: Settings → Developer mode → Add MCP → https://app.kosuke.ai/api/mcp</pre>
+      <ul class="bullets">
+        <li>On the Mac run the Sensei event bridge (streams agent events to your phone):</li>
+      </ul>
+      <pre class="code">npx @kosuke/sensei-bridge --events --tailscale --project viral-study</pre>
+      <ul class="bullets">
+        <li>On the phone: install Sensei → enable Voice Mode → set earbuds as audio output.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">&lt;Workflow&gt;</h2>
+      <ul class="bullets">
+        <li>Define a high-level objective in Sensei (target and context and guardrails) by voice or app.</li>
+        <li>Sensei breaks it into a plan and routes work to Claude Code or Codex or ChatGPT on the Mac.</li>
+        <li>The Mac executes. The bridge sends structured events over Tailscale to Sensei.</li>
+        <li>Sensei converts high-signal events into short audio in your earbuds (not raw logs).</li>
+        <li>You control the run with Voice Mode and earbud gestures. No terminal UI required.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">&lt;Run signals&gt;</h2>
+      <ul class="bullets">
+        <li><strong>INIT</strong> Run opened on the Mac. MCP session and repo and tools are ready. You hear one line that you are live. No Terminal.</li>
+        <li><strong>PLAN</strong> Spoken step list before any code runs. Wrong plan? Say “stop” and state a new objective.</li>
+      </ul>
+      <p class="code-intro">State order on the bridge:</p>
+      <pre class="code">INIT → PLAN → (TOOL)* → CHECKPOINT* → BLOCK? → REVIEW? → OBJECTIVE → IDLE</pre>
+      <p class="code-intro">INIT payload:</p>
+      <pre class="code">{
+  "type": "INIT",
+  "run_id": "run_8f2a",
+  "agent": "claude-code",
+  "spoken": "Session live on viral-study repo."
+}</pre>
+      <p class="code-intro">PLAN payload:</p>
+      <pre class="code">{
+  "type": "PLAN",
+  "steps": ["repro flake", "patch auth.ts", "npm test", "open PR"],
+  "spoken": "Four steps before merge."
+}</pre>
+      <ul class="bullets">
+        <li><strong>TOOL</strong> Optional. One line per tool call only if verbose mode is on.</li>
+        <li><strong>CHECKPOINT</strong> A step finished. You hear what changed and where outputs live and what is next.</li>
+      </ul>
+      <p class="code-intro">CHECKPOINT payload:</p>
+      <pre class="code">{
+  "type": "CHECKPOINT",
+  "summary": "Tests green after auth.ts patch",
+  "artifacts": ["branch fix/flake-auth"],
+  "next": "open PR against main"
+}</pre>
+      <ul class="bullets">
+        <li><strong>BLOCK</strong> Mac waits for you. Merge deploy secrets or policy gates need a voice answer.</li>
+        <li><strong>REVIEW</strong> Spoken gate before production ship. Scope risk and recommended yes or no.</li>
+      </ul>
+      <p class="code-intro">BLOCK payload:</p>
+      <pre class="code">{
+  "type": "BLOCK",
+  "reason": "policy",
+  "needs": "approve_merge",
+  "spoken": "PR 142 ready. Approve or deny?"
+}</pre>
+      <ul class="bullets">
+        <li><strong>OBJECTIVE</strong> Goal done. PR link or report path plus any queued follow-ups.</li>
+        <li><strong>IDLE</strong> No active run. Bridge stays up. Long-press for a new job. Single-tap for status.</li>
+      </ul>
+      <p class="code-intro">TTS filter (what never hits your ears):</p>
+      <pre class="code">drop: raw_stderr · tool_stdout · stack_traces
+keep: PLAN · CHECKPOINT · BLOCK · REVIEW · OBJECTIVE</pre>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">&lt;Voice interface&gt;</h2>
+      <ul class="bullets">
+        <li><strong>Control</strong> Pause resume stop continue or rollback without opening the Mac.</li>
+      </ul>
+      <p class="code-intro">Control intents:</p>
+      <pre class="code">sensei.control.pause()
+sensei.control.resume()
+sensei.control.stop(graceful=true)
+sensei.control.rollback(steps=1)</pre>
+      <ul class="bullets">
+        <li><strong>Routing</strong> Point the next chunk at Claude Code or ChatGPT or Codex.</li>
+      </ul>
+      <p class="code-intro">Routing intents:</p>
+      <pre class="code">sensei.route.set(agent="claude-code")
+sensei.route.set(agent="chatgpt")
+sensei.route.set(agent="codex", paths=["src/auth/**"])</pre>
+      <ul class="bullets">
+        <li><strong>Context</strong> Load profile shards and attached docs so every tool call stays on brief.</li>
+      </ul>
+      <p class="code-intro">Context intents:</p>
+      <pre class="code">sensei.context.use(profile="viral-study")
+sensei.context.attach(["brand.md", "playbook.md"])
+sensei.context.shard(batch=12)</pre>
+      <ul class="bullets">
+        <li><strong>Actions</strong> Ship work from speech. You hear CHECKPOINT or BLOCK only when needed.</li>
+      </ul>
+      <p class="code-intro">Action phrases:</p>
+      <pre class="code">"open a PR with today's changes"
+"merge if CI is green"
+"deploy preview"
+"send summary to Telegram"</pre>
+      <ul class="bullets">
+        <li><strong>Introspection</strong> Replay structured state if you missed audio. Not terminal scrollback.</li>
+        <li><strong>Scheduling</strong> Cron objectives. Earbuds get OBJECTIVE or BLOCK when the job ends.</li>
+      </ul>
+      <p class="code-intro">Status and schedule phrases:</p>
+      <pre class="code">"what's the current state"
+"read the plan again"
+"why is it blocked"
+"run this ingest every Monday 6am"
+"notify me when PR checks pass"</pre>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">&lt;Earbud controls&gt;</h2>
+      <p class="code-intro">Default gesture bindings:</p>
+      <pre class="code">gesture.single_tap    = sensei.status.checkpoint
+gesture.double_tap    = sensei.tts.mute_toggle
+gesture.triple_tap    = claude.session.interrupt
+gesture.long_press    = voice.capture.inject
+gesture.hold_double   = run.cancel(flush=true)</pre>
+      <ul class="bullets">
+        <li><strong>Single tap</strong> Pull the latest CHECKPOINT. Step last change and whether the agent waits on you. Works when TTS is muted.</li>
+      </ul>
+      <p class="code-intro">Status readout shape:</p>
+      <pre class="code">{
+  "spoken": "Checkpoint 3 of 4. Tests passed. Waiting: none.",
+  "step": "open PR",
+  "blocked": false
+}</pre>
+      <ul class="bullets">
+        <li><strong>Double tap</strong> Mute or unmute all Sensei speech. Mac keeps executing in the background.</li>
+        <li><strong>Triple tap</strong> Hard interrupt on Claude Code. Use when the run is off track. Then long-press with a clearer goal.</li>
+      </ul>
+      <p class="code-intro">Interrupt side effect:</p>
+      <pre class="code">claude.session.interrupt()
+→ run.state = BLOCK | IDLE
+→ spoken = "Session stopped. Long-press for new instruction."</pre>
+      <ul class="bullets">
+        <li><strong>Long press</strong> Open Voice Mode mic. Your line becomes the next user message for a new task or a BLOCK answer.</li>
+      </ul>
+      <p class="code-intro">Voice inject examples:</p>
+      <pre class="code">"approve merge on PR 142"
+"use branch hotfix/auth only"
+"stop and run tests only"</pre>
+      <ul class="bullets">
+        <li><strong>Hold + double</strong> Cancel the run and flush the in-flight plan. Return to IDLE. Git commits already pushed remain in the repo.</li>
+      </ul>
+      <p class="code-intro">Sensei app path:</p>
+      <pre class="code">Settings → Earbuds → Gestures → Sync to phone</pre>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">&lt;Guardrails&gt;</h2>
+      <p class="sub">Persistent project profile in Sensei. Same repo and stack and limits every run.</p>
+      <p class="code-intro">Create profile:</p>
+      <pre class="code">/profile new --name viral-study --repo &lt;url&gt; --stack claude,chatgpt</pre>
+      <p class="code-intro">System instructions:</p>
+      <pre class="code">"You are my autonomous research operator. Objective: analyze short-form video at scale (4,812,506 TikToks) and surface what drives virality. Constraints: never merge without approval. Never make payments without approval. Never exfiltrate raw creator data. Request approval for high-risk steps. Process: plan and shard workloads and write features and summaries. Outputs: concise Checkpoints and diffs and links and next actions for audio. Not stack traces."</pre>
+      <p class="code-intro">Attach reference docs:</p>
+      <pre class="code">/profile attach --docs brand.md playbook.md study.md</pre>
+      <p class="code-intro">Policy layer:</p>
+      <pre class="code">/policy set --deploy=confirm --cost&gt;$0=confirm --pr=auto --data=readonly</pre>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">&lt;Operating loop&gt;</h2>
+      <ul class="bullets">
+        <li>Start a run with one clear objective or a saved Sensei template.</li>
+        <li>Listen for PLAN and CHECKPOINT and BLOCK and OBJECTIVE on your earbuds.</li>
+        <li>Approve or redirect or stop with voice or earbud gestures.</li>
+        <li>Close with a results summary and the next recommended batch or task.</li>
+        <li>Iterate weekly. Update profile and guardrails and attached docs when the playbook changes.</li>
+      </ul>
+    </section>
+  </article>
+
+  <p class="hint">Add <code>?export=1</code> for clean capture</p>
+
+  <script>
+    if (new URLSearchParams(location.search).get("export") === "1") {
+      document.documentElement.classList.add("export-mode");
+    }
+  </script>
+</body>
+</html>
