@@ -132,6 +132,13 @@
       margin-bottom: 0;
     }
 
+    pre.code.prose {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.58;
+      color: #ececec;
+    }
+
     .dense-lines {
       display: flex;
       flex-direction: column;
@@ -212,137 +219,86 @@
 
     <section class="section">
       <h2 class="section-title">&lt;Run signals&gt;</h2>
-      <ul class="bullets">
-        <li><strong>INIT</strong> Run opened on the Mac. MCP session and repo and tools are ready. You hear one line that you are live. No Terminal.</li>
-        <li><strong>PLAN</strong> Spoken step list before any code runs. Wrong plan? Say “stop” and state a new objective.</li>
-      </ul>
-      <p class="code-intro">State order on the bridge:</p>
+      <pre class="code prose">INIT means Claude Code on your Mac just bound to Sensei over MCP. The repo is open and tools are checked. You get one short spoken line so you know the session is live. You never open Terminal for that.
+
+PLAN is the full step list read once before any edits run. Example order: reproduce the bug then patch the file then run tests then open a PR. If the plan is wrong you say “stop” in Voice Mode and give a new objective. Sensei sends the updated plan to the agent on the Mac.</pre>
+      <p class="code-intro">Order on the wire:</p>
       <pre class="code">INIT → PLAN → (TOOL)* → CHECKPOINT* → BLOCK? → REVIEW? → OBJECTIVE → IDLE</pre>
-      <p class="code-intro">INIT payload:</p>
-      <pre class="code">{
-  "type": "INIT",
-  "run_id": "run_8f2a",
-  "agent": "claude-code",
-  "spoken": "Session live on viral-study repo."
-}</pre>
-      <p class="code-intro">PLAN payload:</p>
-      <pre class="code">{
-  "type": "PLAN",
-  "steps": ["repro flake", "patch auth.ts", "npm test", "open PR"],
-  "spoken": "Four steps before merge."
-}</pre>
-      <ul class="bullets">
-        <li><strong>TOOL</strong> Optional. One line per tool call only if verbose mode is on.</li>
-        <li><strong>CHECKPOINT</strong> A step finished. You hear what changed and where outputs live and what is next.</li>
-      </ul>
-      <p class="code-intro">CHECKPOINT payload:</p>
+      <pre class="code prose">TOOL is optional noise. Each line is one file edit or API call or shell command. Leave verbose mode off and you only hear CHECKPOINT and BLOCK instead of every tool.
+
+CHECKPOINT is the main audio you live on. A real step finished. You hear what changed and which branch or folder or link holds the output and what the agent does next. That replaces watching a scrolling log.
+
+BLOCK means the Mac stopped because only you can continue. Typical cases: merge or deploy needs approval or a secret is missing or policy blocked spend or data export. Answer with long-press voice. The agent resumes when Sensei gets your line.
+
+REVIEW is the spoken safety check before anything hits production. You get scope and risk and a clear yes or no ask.
+
+OBJECTIVE means the run succeeded. PR URL or report path or draft location plus any follow-up tasks the agent queued.
+
+IDLE means nothing is executing but the bridge stays connected. Long-press to start again. Single-tap replays the last checkpoint without starting speech feed.</pre>
+      <p class="code-intro">What Sensei speaks vs drops:</p>
+      <pre class="code">KEEP  PLAN · CHECKPOINT · BLOCK · REVIEW · OBJECTIVE
+DROP  raw stderr · per-tool spam · stack traces</pre>
+      <p class="code-intro">Example CHECKPOINT JSON (shortened for TTS):</p>
       <pre class="code">{
   "type": "CHECKPOINT",
   "summary": "Tests green after auth.ts patch",
   "artifacts": ["branch fix/flake-auth"],
-  "next": "open PR against main"
+  "next": "open PR against main",
+  "spoken": "Step three done. Tests passed. Next is pull request."
 }</pre>
-      <ul class="bullets">
-        <li><strong>BLOCK</strong> Mac waits for you. Merge deploy secrets or policy gates need a voice answer.</li>
-        <li><strong>REVIEW</strong> Spoken gate before production ship. Scope risk and recommended yes or no.</li>
-      </ul>
-      <p class="code-intro">BLOCK payload:</p>
-      <pre class="code">{
-  "type": "BLOCK",
-  "reason": "policy",
-  "needs": "approve_merge",
-  "spoken": "PR 142 ready. Approve or deny?"
-}</pre>
-      <ul class="bullets">
-        <li><strong>OBJECTIVE</strong> Goal done. PR link or report path plus any queued follow-ups.</li>
-        <li><strong>IDLE</strong> No active run. Bridge stays up. Long-press for a new job. Single-tap for status.</li>
-      </ul>
-      <p class="code-intro">TTS filter (what never hits your ears):</p>
-      <pre class="code">drop: raw_stderr · tool_stdout · stack_traces
-keep: PLAN · CHECKPOINT · BLOCK · REVIEW · OBJECTIVE</pre>
     </section>
 
     <section class="section">
       <h2 class="section-title">&lt;Voice interface&gt;</h2>
-      <ul class="bullets">
-        <li><strong>Control</strong> Pause resume stop continue or rollback without opening the Mac.</li>
-      </ul>
-      <p class="code-intro">Control intents:</p>
-      <pre class="code">sensei.control.pause()
-sensei.control.resume()
-sensei.control.stop(graceful=true)
-sensei.control.rollback(steps=1)</pre>
-      <ul class="bullets">
-        <li><strong>Routing</strong> Point the next chunk at Claude Code or ChatGPT or Codex.</li>
-      </ul>
-      <p class="code-intro">Routing intents:</p>
-      <pre class="code">sensei.route.set(agent="claude-code")
-sensei.route.set(agent="chatgpt")
-sensei.route.set(agent="codex", paths=["src/auth/**"])</pre>
-      <ul class="bullets">
-        <li><strong>Context</strong> Load profile shards and attached docs so every tool call stays on brief.</li>
-      </ul>
-      <p class="code-intro">Context intents:</p>
-      <pre class="code">sensei.context.use(profile="viral-study")
-sensei.context.attach(["brand.md", "playbook.md"])
-sensei.context.shard(batch=12)</pre>
-      <ul class="bullets">
-        <li><strong>Actions</strong> Ship work from speech. You hear CHECKPOINT or BLOCK only when needed.</li>
-      </ul>
-      <p class="code-intro">Action phrases:</p>
-      <pre class="code">"open a PR with today's changes"
+      <pre class="code prose">Everything you say in Voice Mode goes to the same pipe as typing in Claude Code. Sensei transcribes from your earbuds mic classifies the intent and injects a user message on the Mac. You steer runs while walking or driving without opening the laptop.
+
+Control covers pause resume stop continue and rollback last checkpoint. Use it when the agent is moving too fast or you need to change direction mid-run.
+
+Routing sends the next piece of work to Claude Code or ChatGPT or Codex on specific paths. Say which brain should own the next steps.
+
+Context locks profile shards and docs. The viral-study profile plus brand.md plus batch 12 means every tool call stays inside your guardrails.
+
+Actions are ship commands: open PR merge when CI is green deploy preview ping Telegram. You only hear audio again when a CHECKPOINT lands or a BLOCK needs you.
+
+Introspection replays plan and state when you missed a line. Scheduling runs jobs on a clock and calls your earbuds when they finish or block.</pre>
+      <p class="code-intro">Say any of these (Sensei maps to the Mac):</p>
+      <pre class="code">"pause the run"
+"resume"
+"stop and save where you are"
+"switch to ChatGPT for the copy"
+"use Claude Code on the repo"
+"use viral-study profile and batch 12"
+"open a PR with today's changes"
 "merge if CI is green"
-"deploy preview"
-"send summary to Telegram"</pre>
-      <ul class="bullets">
-        <li><strong>Introspection</strong> Replay structured state if you missed audio. Not terminal scrollback.</li>
-        <li><strong>Scheduling</strong> Cron objectives. Earbuds get OBJECTIVE or BLOCK when the job ends.</li>
-      </ul>
-      <p class="code-intro">Status and schedule phrases:</p>
-      <pre class="code">"what's the current state"
-"read the plan again"
+"what's the current state"
 "why is it blocked"
-"run this ingest every Monday 6am"
+"run this ingest every Monday at 6am"
 "notify me when PR checks pass"</pre>
     </section>
 
     <section class="section">
       <h2 class="section-title">&lt;Earbud controls&gt;</h2>
-      <p class="code-intro">Default gesture bindings:</p>
-      <pre class="code">gesture.single_tap    = sensei.status.checkpoint
-gesture.double_tap    = sensei.tts.mute_toggle
-gesture.triple_tap    = claude.session.interrupt
-gesture.long_press    = voice.capture.inject
-gesture.hold_double   = run.cancel(flush=true)</pre>
-      <ul class="bullets">
-        <li><strong>Single tap</strong> Pull the latest CHECKPOINT. Step last change and whether the agent waits on you. Works when TTS is muted.</li>
-      </ul>
-      <p class="code-intro">Status readout shape:</p>
-      <pre class="code">{
-  "spoken": "Checkpoint 3 of 4. Tests passed. Waiting: none.",
-  "step": "open PR",
-  "blocked": false
-}</pre>
-      <ul class="bullets">
-        <li><strong>Double tap</strong> Mute or unmute all Sensei speech. Mac keeps executing in the background.</li>
-        <li><strong>Triple tap</strong> Hard interrupt on Claude Code. Use when the run is off track. Then long-press with a clearer goal.</li>
-      </ul>
-      <p class="code-intro">Interrupt side effect:</p>
-      <pre class="code">claude.session.interrupt()
-→ run.state = BLOCK | IDLE
-→ spoken = "Session stopped. Long-press for new instruction."</pre>
-      <ul class="bullets">
-        <li><strong>Long press</strong> Open Voice Mode mic. Your line becomes the next user message for a new task or a BLOCK answer.</li>
-      </ul>
-      <p class="code-intro">Voice inject examples:</p>
+      <pre class="code prose">Gestures are the fast path when you cannot talk. They hit Sensei on the phone which already has the live run over Tailscale. Configure once under Settings → Earbuds → Gestures.
+
+Single tap is a silent status pull. Sensei reads the latest CHECKPOINT even if you muted TTS. You hear current step plus last change plus whether the agent waits on you.
+
+Double tap toggles all Sensei speech in your ears. The Mac keeps working. Use this in meetings then double-tap again or single-tap once for a readout.
+
+Triple tap is emergency stop for Claude Code. Tools halt on the Mac. Use when the agent is off track. Follow with long-press and a sharper objective.
+
+Long press opens the mic. Your sentence becomes the next user message. That covers new tasks and BLOCK answers like approve merge or use branch hotfix only.
+
+Hold + double cancels the run and clears the in-flight plan back to IDLE. Commits already on GitHub stay pushed. Check the repo if you are unsure what landed.</pre>
+      <p class="code-intro">Gesture map:</p>
+      <pre class="code">1× tap      latest CHECKPOINT readout
+2× tap      mute / unmute Sensei TTS
+3× tap      interrupt Claude Code session
+long press  Voice Mode → inject message
+hold + 2×   cancel run → IDLE</pre>
+      <p class="code-intro">After long press (examples):</p>
       <pre class="code">"approve merge on PR 142"
 "use branch hotfix/auth only"
 "stop and run tests only"</pre>
-      <ul class="bullets">
-        <li><strong>Hold + double</strong> Cancel the run and flush the in-flight plan. Return to IDLE. Git commits already pushed remain in the repo.</li>
-      </ul>
-      <p class="code-intro">Sensei app path:</p>
-      <pre class="code">Settings → Earbuds → Gestures → Sync to phone</pre>
     </section>
 
     <section class="section">
